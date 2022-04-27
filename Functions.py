@@ -43,12 +43,13 @@ def get_final_data():
     return X_train, X_test, y_train, y_test
 
 def get_raw_data():
-    colsName=['festivo', 'mes', 'diaSemana', 'hora', 'mda', 'mtr', 'mda7', 'mtr7',
-       'ypast7', 'festivo7', 'mda14', 'mtr14', 'ypast14', 'festivo14', 'mda52',
-       'mtr52', 'ypast52', 'festivo52', 'ypast3avg', 'eolica', 'fotovol',
-       'demanda', 'temperatura', 'hsc', 'DART (MXN/MWh)', 'DARTbin', 'Year',
-       'Day']
-    df_train = pd.read_csv('data/BD.csv');
+    #colsName=['festivo', 'mes', 'diaSemana', 'hora', 'mda', 'mtr', 'mda7', 'mtr7',
+       #'ypast7', 'festivo7', 'mda14', 'mtr14', 'ypast14', 'festivo14', 'mda52',
+       #'mtr52', 'ypast52', 'festivo52', 'ypast3avg', 'eolica', 'fotovol',
+       #'demanda', 'temperatura', 'hsc', 'DART (MXN/MWh)', 'DARTbin', 'Year',
+      # 'Day']
+    
+    df_train = pd.read_csv('data/Nueva.csv');
     
     df_train['fecha']=pd.to_datetime(df_train['fecha']);
     df_train['fecha_h']=pd.to_datetime(df_train['fecha_h']);
@@ -77,6 +78,39 @@ def get_raw_data():
     
     return df_train, y_train
 
+def get_input_data():
+    #colsName=['festivo', 'mes', 'diaSemana', 'hora', 'mda', 'mtr', 'mda7', 'mtr7',
+    #   'ypast7', 'festivo7', 'mda14', 'mtr14', 'ypast14', 'festivo14', 'mda52',
+     #  'mtr52', 'ypast52', 'festivo52', 'ypast3avg', 'eolica', 'fotovol',
+     #  'demanda', 'temperatura', 'hsc', 'DART (MXN/MWh)', 'DARTbin', 'Year',
+     #  'Day']
+    df_input = pd.read_csv('Input.csv');
+    
+    df_input['fecha']=pd.to_datetime(df_input['fecha']);
+    df_input['fecha_h']=pd.to_datetime(df_input['fecha_h']);
 
+    df_input['temperatura']= df_input['temperatura'].replace("#Â¡REF!", np.NaN)
+    df_input['temperatura']=pd.to_numeric(df_input['temperatura'])
+    
+    df_input['DART (MXN/MWh)']=df_input['mtr']-df_input['mda']
+    df_input['DARTbin']=df_input['mtr']>=df_input['mda']
+    df_input['DARTbin']=df_input['DARTbin'].map({True:1,False:0})
+    
+    df_input['Year']=pd.DatetimeIndex(df_input['fecha']).year
+    df_input['Day']=pd.DatetimeIndex(df_input['fecha']).day
+    
+    df_input=df_input.dropna()
+    
+    DF_temp_A = df_input[df_input['fecha'] < '2021-02-13']
+    DF_temp_B = df_input[df_input['fecha'] >= '2021-02-22']
+    
+    df_input=pd.concat([DF_temp_A,DF_temp_B],axis=0)
+
+
+    y_input = df_input.DARTbin
+  
+        
+    
+    return df_input, y_input
 
 
